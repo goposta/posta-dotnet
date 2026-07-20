@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="Posta.csproj" />
+  <Project Path="Posta.Aspire/Posta.Aspire.csproj" />
+  <Project Path="Posta.Tests/Posta.Tests.csproj" />
+</Solution>
