@@ -1,0 +1,97 @@
+name: Publish NuGet packages
+
+on:
+  release:
+    types: [published]
+
+concurrency:
+  group: nuget-${{ github.event.release.tag_name }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  publish:
+    name: Publish to NuGet.org
+    runs-on: ubuntu-latest
+    environment: release
+
+    steps:
+      - name: Checkout release
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.release.tag_name }}
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 11.0.x
+          dotnet-quality: preview
+
+      - name: Resolve package version
+        shell: bash
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: |
+          VERSION="${RELEASE_TAG#v}"
+
+          if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$ ]]; then
+            echo "Invalid release tag: $RELEASE_TAG"
+            echo "Expected format: v1.2.3 or v1.2.3-preview.1"
+            exit 1
+          fi
+
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+          echo "Package version: $VERSION"
+
+      - name: Restore
+        run: |
+          dotnet restore Posta.csproj
+          dotnet restore Posta.Aspire/Posta.Aspire.csproj
+          dotnet restore Posta.Tests/Posta.Tests.csproj
+
+      - name: Test
+        run: |
+          dotnet test Posta.Tests/Posta.Tests.csproj \
+            --configuration Release \
+            --no-restore
+
+      - name: Pack Posta
+        run: |
+          dotnet pack Posta.csproj \
+            --configuration Release \
+            --no-restore \
+            --output artifacts \
+            --include-symbols \
+            -p:SymbolPackageFormat=snupkg \
+            -p:PackageVersion="$VERSION" \
+            -p:ContinuousIntegrationBuild=true
+
+      - name: Pack Posta.Aspire
+        run: |
+          dotnet pack Posta.Aspire/Posta.Aspire.csproj \
+            --configuration Release \
+            --no-restore \
+            --output artifacts \
+            --include-symbols \
+            -p:SymbolPackageFormat=snupkg \
+            -p:PackageVersion="$VERSION" \
+            -p:ContinuousIntegrationBuild=true
+
+      - name: Show packages
+        run: ls -la artifacts
+
+      - name: Authenticate with NuGet.org
+        id: nuget-login
+        uses: NuGet/login@v1
+        with:
+          user: ${{ secrets.NUGET_USER }}
+
+      - name: Publish packages
+        run: |
+          dotnet nuget push "artifacts/*.nupkg" \
+            --source "https://api.nuget.org/v3/index.json" \
+            --api-key "${{ steps.nuget-login.outputs.NUGET_API_KEY }}" \
+            --skip-duplicate
