@@ -102,6 +102,12 @@ public interface IPostaAdminClient : IPostaSectionClient
     /// <summary>Update platform settings</summary>
     Task<Admin.UpdatePlatformSettingsResponse?> UpdatePlatformSettingsAsync(Admin.UpdatePlatformSettingsRequest request, CancellationToken cancellationToken = default);
 
+    /// <summary>Get the cached Posta update status</summary>
+    Task<Admin.GetUpdateStatusResponse?> GetUpdateStatusAsync(CancellationToken cancellationToken = default);
+
+    /// <summary>Dismiss the update notice for a version</summary>
+    Task<Admin.DismissUpdateNoticeResponse?> DismissUpdateNoticeAsync(Admin.DismissUpdateNoticeRequest request, CancellationToken cancellationToken = default);
+
     /// <summary>List all users</summary>
     Task<Admin.ListAllUsersResponse?> ListAllUsersAsync(Admin.ListAllUsersRequest? request = null, CancellationToken cancellationToken = default);
 
@@ -1095,6 +1101,21 @@ internal sealed partial class PostaClientSection
         };
 
         return SendAsync<Admin.UpdatePlatformSettingsResponse>(_endpoints.UpdatePlatformSettings, postaRequest, cancellationToken);
+    }
+
+    public Task<Admin.GetUpdateStatusResponse?> GetUpdateStatusAsync(CancellationToken cancellationToken = default)
+    {
+        return SendAsync<Admin.GetUpdateStatusResponse>(_endpoints.GetUpdateStatus, null, cancellationToken);
+    }
+
+    public Task<Admin.DismissUpdateNoticeResponse?> DismissUpdateNoticeAsync(Admin.DismissUpdateNoticeRequest request, CancellationToken cancellationToken = default)
+    {
+        PostaRequest postaRequest = new()
+        {
+            Body = request,
+        };
+
+        return SendAsync<Admin.DismissUpdateNoticeResponse>(_endpoints.DismissUpdateNotice, postaRequest, cancellationToken);
     }
 
     public Task<Admin.ListAllUsersResponse?> ListAllUsersAsync(Admin.ListAllUsersRequest? request = null, CancellationToken cancellationToken = default)

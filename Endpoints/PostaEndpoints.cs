@@ -1,6 +1,6 @@
 namespace Posta.Endpoints;
 
-/// <summary>Provides overridable definitions for every Posta 0.11.0 API endpoint.</summary>
+/// <summary>Provides overridable definitions for every supported Posta API endpoint.</summary>
 public interface IPostaEndpoints
 {
     /// <summary>Platform analytics</summary>
@@ -83,6 +83,12 @@ public interface IPostaEndpoints
 
     /// <summary>Update platform settings</summary>
     PostaEndpoint UpdatePlatformSettings { get; }
+
+    /// <summary>Get update status</summary>
+    PostaEndpoint GetUpdateStatus { get; }
+
+    /// <summary>Dismiss an update notice</summary>
+    PostaEndpoint DismissUpdateNotice { get; }
 
     /// <summary>List all users</summary>
     PostaEndpoint ListAllUsers { get; }
@@ -760,6 +766,12 @@ public class PostaEndpoints : IPostaEndpoints
 
     /// <inheritdoc />
     public virtual PostaEndpoint UpdatePlatformSettings { get; } = new(HttpMethod.Put, "/api/v1/admin/settings", PostaAuthentication.AccessToken);
+
+    /// <inheritdoc />
+    public virtual PostaEndpoint GetUpdateStatus { get; } = new(HttpMethod.Get, "/api/v1/admin/update", PostaAuthentication.AccessToken);
+
+    /// <inheritdoc />
+    public virtual PostaEndpoint DismissUpdateNotice { get; } = new(HttpMethod.Post, "/api/v1/admin/update/dismiss", PostaAuthentication.AccessToken);
 
     /// <inheritdoc />
     public virtual PostaEndpoint ListAllUsers { get; } = new(HttpMethod.Get, "/api/v1/admin/users", PostaAuthentication.AccessToken);

@@ -4,6 +4,7 @@ using Posta.Configuration;
 using Posta.Endpoints;
 using Posta.Models.Constants;
 using Posta.Models.Emails;
+using Posta.Models.Admin;
 
 namespace Posta.Tests;
 
@@ -113,6 +114,78 @@ public sealed class PostaClientTests
 
         Assert.False(hasAuthorization);
         Assert.Equal("ok", response?.Status);
+    }
+
+    [Fact]
+    public async Task GetUpdateStatusUsesAdminEndpointAndDeserializesResponse()
+    {
+        Uri? requestUri = null;
+        var handler = new TestHttpMessageHandler((request, _) =>
+        {
+            requestUri = request.RequestUri;
+            return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent("""
+                    {
+                      "data": {
+                        "current_version": "v0.12.0",
+                        "latest_version": "v0.13.0",
+                        "release_url": "https://github.com/goposta/posta/releases/tag/v0.13.0",
+                        "published_at": "2026-07-22T18:53:25Z",
+                        "update_available": true,
+                        "enabled": true,
+                        "checked_at": "2026-07-23T03:00:00Z",
+                        "last_error": ""
+                      },
+                      "success": true
+                    }
+                    """, System.Text.Encoding.UTF8, "application/json")
+            });
+        });
+        using var httpClient = new HttpClient(handler)
+        {
+            BaseAddress = new Uri("https://posta.example.com")
+        };
+        using var client = new PostaClient(httpClient, new FixedCredentialProvider("access-token"));
+
+        GetUpdateStatusResponse? response = await client.Admin.GetUpdateStatusAsync();
+
+        Assert.Equal("https://posta.example.com/api/v1/admin/update", requestUri?.AbsoluteUri);
+        Assert.True(response?.Success);
+        Assert.Equal("v0.13.0", response?.Data?.LatestVersion);
+        Assert.True(response?.Data?.UpdateAvailable);
+        Assert.Equal(DateTimeOffset.Parse("2026-07-22T18:53:25Z"), response?.Data?.PublishedAt);
+    }
+
+    [Fact]
+    public async Task DismissUpdateNoticePostsVersion()
+    {
+        Uri? requestUri = null;
+        string? requestBody = null;
+        var handler = new TestHttpMessageHandler(async (request, cancellationToken) =>
+        {
+            requestUri = request.RequestUri;
+            requestBody = await request.Content!.ReadAsStringAsync(cancellationToken);
+            return new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent("""
+                    {"data":{"message":"update notice dismissed"},"success":true}
+                    """, System.Text.Encoding.UTF8, "application/json")
+            };
+        });
+        using var httpClient = new HttpClient(handler)
+        {
+            BaseAddress = new Uri("https://posta.example.com")
+        };
+        using var client = new PostaClient(httpClient, new FixedCredentialProvider("access-token"));
+
+        DismissUpdateNoticeResponse? response = await client.Admin.DismissUpdateNoticeAsync(
+            new DismissUpdateNoticeRequest { Version = "v0.13.0" });
+
+        Assert.Equal("https://posta.example.com/api/v1/admin/update/dismiss", requestUri?.AbsoluteUri);
+        Assert.Equal("{\"version\":\"v0.13.0\"}", requestBody);
+        Assert.True(response?.Success);
+        Assert.Equal("update notice dismissed", response?.Data?.Message);
     }
 
     private sealed class FixedCredentialProvider(string? credential) : IPostaCredentialProvider
