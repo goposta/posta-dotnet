@@ -10,8 +10,8 @@ public sealed class EndpointCatalogTests
         var areas = typeof(IPostaEndpoints).GetInterfaces();
         var operationCount = areas.Sum(area => area.GetProperties().Length);
 
-        Assert.Equal(16, areas.Length);
-        Assert.Equal(226, operationCount);
+        Assert.Equal(15, areas.Length);
+        Assert.Equal(219, operationCount);
         Assert.All(areas, area => Assert.EndsWith("Endpoints", area.Name, StringComparison.Ordinal));
     }
 

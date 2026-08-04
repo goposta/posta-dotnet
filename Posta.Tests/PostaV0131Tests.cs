@@ -4,7 +4,6 @@ using System.Text;
 using Posta.Clients;
 using Posta.Configuration;
 using Posta.Endpoints;
-using Posta.Models.Inbound;
 using Posta.Models.Subscribers;
 using Posta.Models.Templates;
 using Posta.Security;
@@ -58,26 +57,6 @@ public sealed class PostaV0131Tests
 
         Assert.Contains("filename=hello.html", body);
         Assert.Contains("Content-Type: text/html", body);
-    }
-
-    [Fact]
-    public async Task RawInboundDownloadReturnsStreamingResponse()
-    {
-        var handler = new TestHttpMessageHandler((request, _) =>
-        {
-            Assert.Equal("/api/v1/workspaces/current/inbound-emails/id-1/raw", request.RequestUri?.AbsolutePath);
-            return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
-            {
-                Content = new ByteArrayContent(Encoding.UTF8.GetBytes("raw-message"))
-            });
-        });
-        using var http = new HttpClient(handler) { BaseAddress = new Uri("https://posta.example.com") };
-        using var client = new PostaClient(http, new FixedCredentialProvider("token"));
-
-        await using var response = await client.Inbound.DownloadTheRawRfc5322MessageEmlAsync(
-            new DownloadTheRawRfc5322MessageEmlRequest { Id = "id-1" });
-        using var reader = new StreamReader(response.Stream);
-        Assert.Equal("raw-message", await reader.ReadToEndAsync());
     }
 
     [Fact]

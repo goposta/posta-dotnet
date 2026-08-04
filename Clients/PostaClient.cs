@@ -111,7 +111,6 @@ public sealed class PostaClient : IDisposable
     public PostaSubscribersClient Subscribers { get; private set; } = null!;
     public PostaSubscriberListsClient SubscriberLists { get; private set; } = null!;
     public PostaUnsubscribeListsClient UnsubscribeLists { get; private set; } = null!;
-    public PostaInboundClient Inbound { get; private set; } = null!;
     public PostaWebhooksClient Webhooks { get; private set; } = null!;
     public PostaWorkspaceResourcesClient WorkspaceResources { get; private set; } = null!;
     public PostaAdminClient Admin { get; private set; } = null!;
@@ -130,7 +129,6 @@ public sealed class PostaClient : IDisposable
         Subscribers = new PostaSubscribersClient(transport, Endpoints);
         SubscriberLists = new PostaSubscriberListsClient(transport, Endpoints);
         UnsubscribeLists = new PostaUnsubscribeListsClient(transport, Endpoints);
-        Inbound = new PostaInboundClient(transport, Endpoints);
         Webhooks = new PostaWebhooksClient(transport, Endpoints);
         WorkspaceResources = new PostaWorkspaceResourcesClient(transport, Endpoints);
         Admin = new PostaAdminClient(transport, Endpoints);

@@ -28,12 +28,11 @@ SendAnEmailResponse? response = await client.Emails.SendAnEmailAsync(
     });
 ```
 
-The client exposes concrete, typed API clients such as `Emails`, `Templates`, `Campaigns`, `Subscribers`, `Inbound`, `Webhooks`, `Workspaces`, and `Admin`:
+The client exposes concrete, typed API clients such as `Emails`, `Templates`, `Campaigns`, `Subscribers`, `Webhooks`, `Workspaces`, and `Admin`:
 
 ```csharp
 PostaEmailsClient emails = client.Emails;
 PostaWebhooksClient webhooks = client.Webhooks;
-PostaInboundClient inbound = client.Inbound;
 PostaAdminClient admin = client.Admin;
 ```
 
@@ -140,7 +139,7 @@ When an `ILoggerFactory` is supplied to `PostaClient`, non-successful responses 
 
 ## Custom endpoints
 
-Endpoint definitions are grouped by API area, including `IPostaEmailsEndpoints`, `IPostaWebhooksEndpoints`, `IPostaInboundEndpoints`, and `IPostaAdminEndpoints`. `IPostaEndpoints` combines these focused endpoint contracts into the complete catalog used by `PostaClient`. The default `PostaEndpoints` implementation is partial, with each API area's virtual properties stored in a matching file.
+Endpoint definitions are grouped by API area, including `IPostaEmailsEndpoints`, `IPostaWebhooksEndpoints`, and `IPostaAdminEndpoints`. `IPostaEndpoints` combines these focused endpoint contracts into the complete catalog used by `PostaClient`. The default `PostaEndpoints` implementation is partial, with each API area's virtual properties stored in a matching file.
 
 Deployments with custom routes can continue to override only the required operation:
 
@@ -156,7 +155,7 @@ public sealed class CustomPostaEndpoints : PostaEndpoints
 
 ## API coverage
 
-The models, endpoints, and operations follow Posta 0.13.1. This includes inbound email management, streaming raw RFC 5322 messages and attachments, CSV subscriber import, HTML template import, update status, and authenticated SMTP-relay related platform APIs.
+The models, endpoints, and operations follow the 219 operations documented by Posta 0.13.1. This includes CSV subscriber import, HTML template import, update status, authenticated SMTP-relay related platform APIs, and documented inbound webhook event payloads.
 
 Multipart imports accept file bytes and construct the required form fields:
 
