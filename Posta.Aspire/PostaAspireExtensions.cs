@@ -59,13 +59,13 @@ public static class PostaAspireExtensions
         ArgumentException.ThrowIfNullOrWhiteSpace(connectionName);
 
         PostaClientSettings settings = new();
-        string sectionName = configurationSectionName ?? DefaultConfigurationSection;
+        var sectionName = configurationSectionName ?? DefaultConfigurationSection;
         builder.Configuration.GetSection(sectionName).Bind(settings);
         builder.Configuration.GetSection($"{sectionName}:{connectionName}").Bind(settings);
         ApplyConnectionString(settings, builder.Configuration.GetConnectionString(connectionName));
         configureSettings?.Invoke(settings);
 
-        Uri endpoint = settings.Endpoint ?? new Uri($"http://{connectionName}", UriKind.Absolute);
+        var endpoint = settings.Endpoint ?? new Uri($"http://{connectionName}", UriKind.Absolute);
         builder.Services.AddHttpClient($"Posta:{connectionName}", client =>
         {
             client.BaseAddress = endpoint;
@@ -73,11 +73,11 @@ public static class PostaAspireExtensions
         }).AddServiceDiscovery();
 
         builder.Services.TryAddSingleton<IPostaEndpoints, PostaEndpoints>();
-        builder.Services.AddKeyedSingleton<IPostaClient>(serviceKey, (services, _) =>
+        builder.Services.AddKeyedSingleton<PostaClient>(serviceKey, (services, _) =>
         {
-            IPostaCredentialProvider credentialProvider =
+            var credentialProvider =
                 services.GetService<IPostaCredentialProvider>() ?? new SettingsCredentialProvider(settings);
-            HttpClient httpClient = services.GetRequiredService<IHttpClientFactory>().CreateClient($"Posta:{connectionName}");
+            var httpClient = services.GetRequiredService<IHttpClientFactory>().CreateClient($"Posta:{connectionName}");
             return new PostaClient(
                 httpClient,
                 credentialProvider,
@@ -87,7 +87,7 @@ public static class PostaAspireExtensions
 
         if (registerDefault)
         {
-            builder.Services.TryAddSingleton(services => services.GetRequiredKeyedService<IPostaClient>(serviceKey));
+            builder.Services.TryAddSingleton(services => services.GetRequiredKeyedService<PostaClient>(serviceKey));
         }
     }
 
@@ -98,22 +98,22 @@ public static class PostaAspireExtensions
             return;
         }
 
-        if (Uri.TryCreate(connectionString, UriKind.Absolute, out Uri? uri))
+        if (Uri.TryCreate(connectionString, UriKind.Absolute, out var uri))
         {
             settings.Endpoint = uri;
             return;
         }
 
-        foreach (string part in connectionString.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+        foreach (var part in connectionString.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
         {
-            int separator = part.IndexOf('=');
+            var separator = part.IndexOf('=');
             if (separator <= 0)
             {
                 continue;
             }
 
-            string name = part[..separator];
-            string value = part[(separator + 1)..];
+            var name = part[..separator];
+            var value = part[(separator + 1)..];
             if (name.Equals("Endpoint", StringComparison.OrdinalIgnoreCase) &&
                 Uri.TryCreate(value, UriKind.Absolute, out uri))
             {

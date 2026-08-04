@@ -37,7 +37,7 @@ public sealed class PostaTransportTests
             BearerToken = "override"
         };
 
-        object? response = await transport.SendAsync<object>(endpoint, request, CancellationToken.None);
+        var response = await transport.SendAsync<object>(endpoint, request, CancellationToken.None);
 
         Assert.Null(response);
         Assert.Equal(
@@ -59,7 +59,7 @@ public sealed class PostaTransportTests
         var transport = new PostaTransport(httpClient, new FixedCredentialProvider(null));
         var endpoint = new PostaEndpoint(HttpMethod.Post, "/verify", PostaAuthentication.None);
 
-        PostaApiException exception = await Assert.ThrowsAsync<PostaApiException>(
+        var exception = await Assert.ThrowsAsync<PostaApiException>(
             () => transport.SendAsync<object>(endpoint, null, CancellationToken.None));
 
         Assert.Equal(HttpStatusCode.UnprocessableEntity, exception.StatusCode);
@@ -87,7 +87,7 @@ public sealed class PostaTransportTests
         var transport = new PostaTransport(httpClient, new FixedCredentialProvider(null), logger);
         var endpoint = new PostaEndpoint(HttpMethod.Get, "/resources/missing", PostaAuthentication.None);
 
-        PostaApiException exception = await Assert.ThrowsAsync<PostaApiException>(
+        var exception = await Assert.ThrowsAsync<PostaApiException>(
             () => transport.SendAsync<object>(endpoint, null, CancellationToken.None));
 
         Assert.Equal("resource_not_found", exception.Error?.Code);
@@ -108,7 +108,7 @@ public sealed class PostaTransportTests
         var transport = new PostaTransport(httpClient, new FixedCredentialProvider(null));
         var endpoint = new PostaEndpoint(HttpMethod.Get, "/private", PostaAuthentication.ApiKey);
 
-        InvalidOperationException exception = await Assert.ThrowsAsync<InvalidOperationException>(
+        var exception = await Assert.ThrowsAsync<InvalidOperationException>(
             () => transport.SendAsync<object>(endpoint, null, CancellationToken.None));
 
         Assert.Contains("ApiKey", exception.Message, StringComparison.Ordinal);
@@ -129,7 +129,7 @@ public sealed class PostaTransportTests
             false,
             "Missing response schema.");
 
-        NotSupportedException exception = await Assert.ThrowsAsync<NotSupportedException>(
+        var exception = await Assert.ThrowsAsync<NotSupportedException>(
             () => transport.SendAsync<object>(endpoint, null, CancellationToken.None));
 
         Assert.Contains("Missing response schema.", exception.Message, StringComparison.Ordinal);
@@ -145,7 +145,7 @@ public sealed class PostaTransportTests
         var transport = new PostaTransport(httpClient, new FixedCredentialProvider(null));
         var endpoint = new PostaEndpoint(HttpMethod.Get, "/items/{id}", PostaAuthentication.None);
 
-        ArgumentException exception = await Assert.ThrowsAsync<ArgumentException>(
+        var exception = await Assert.ThrowsAsync<ArgumentException>(
             () => transport.SendAsync<object>(endpoint, null, CancellationToken.None));
 
         Assert.Equal("values", exception.ParamName);
@@ -166,7 +166,7 @@ public sealed class PostaTransportTests
             Content = new StringContent("content")
         };
 
-        ArgumentException exception = await Assert.ThrowsAsync<ArgumentException>(
+        var exception = await Assert.ThrowsAsync<ArgumentException>(
             () => transport.SendAsync<object>(endpoint, request, CancellationToken.None));
 
         Assert.Equal("request", exception.ParamName);

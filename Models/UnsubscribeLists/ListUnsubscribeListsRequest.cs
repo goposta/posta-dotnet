@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 namespace Posta.Models.UnsubscribeLists;
 
 /// <summary>Represents the ListUnsubscribeListsRequest payload.</summary>
-public class ListUnsubscribeListsRequest
+public class ListUnsubscribeListsRequest : Shared.SearchableListRequest
 {
     /// <summary>Gets or sets the <c>page</c> query parameter.</summary>
     [JsonIgnore]

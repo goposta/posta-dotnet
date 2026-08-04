@@ -7,7 +7,7 @@ namespace Posta.Clients;
 /// <summary>
 /// Base implementation used by Posta API section clients.
 /// </summary>
-public abstract class PostaSectionClient : IPostaSectionClient
+public abstract class PostaSectionClient
 {
     private readonly PostaTransport _transport;
 

@@ -7,9 +7,8 @@ using Microsoft.Extensions.Logging.Abstractions;
 namespace Posta.Clients;
 
 /// <summary>Client for the Posta HTTP API.</summary>
-public sealed class PostaClient : IPostaClient, IDisposable
+public sealed class PostaClient : IDisposable
 {
-    private readonly PostaClientSection _section;
     private readonly HttpClient? _ownedHttpClient;
 
     /// <summary>Creates a client for a Posta server.</summary>
@@ -56,9 +55,10 @@ public sealed class PostaClient : IPostaClient, IDisposable
         };
 
         Endpoints = new PostaEndpoints();
-        _section = new PostaClientSection(
-            new PostaTransport(_ownedHttpClient, new PostaCredentialProvider(settings), loggerFactory.CreateLogger("Posta.Transport")),
-            Endpoints);
+        InitializeClients(new PostaTransport(
+            _ownedHttpClient,
+            new PostaCredentialProvider(settings),
+            loggerFactory.CreateLogger("Posta.Transport")));
     }
 
     /// <summary>
@@ -92,45 +92,51 @@ public sealed class PostaClient : IPostaClient, IDisposable
         }
 
         Endpoints = endpoints ?? new PostaEndpoints();
-        _section = new PostaClientSection(
-            new PostaTransport(httpClient, credentialProvider, loggerFactory.CreateLogger("Posta.Transport")),
-            Endpoints);
+        InitializeClients(new PostaTransport(
+            httpClient,
+            credentialProvider,
+            loggerFactory.CreateLogger("Posta.Transport")));
     }
 
-    /// <inheritdoc />
+    /// <summary>Gets the endpoint catalog.</summary>
     public IPostaEndpoints Endpoints { get; }
-    /// <inheritdoc />
-    public IPostaAuthClient Auth => _section;
-    /// <inheritdoc />
-    public IPostaOAuthClient OAuth => _section;
-    /// <inheritdoc />
-    public IPostaUsersClient Users => _section;
-    /// <inheritdoc />
-    public IPostaWorkspacesClient Workspaces => _section;
-    /// <inheritdoc />
-    public IPostaEmailsClient Emails => _section;
-    /// <inheritdoc />
-    public IPostaTemplatesClient Templates => _section;
-    /// <inheritdoc />
-    public IPostaCampaignsClient Campaigns => _section;
-    /// <inheritdoc />
-    public IPostaSubscribersClient Subscribers => _section;
-    /// <inheritdoc />
-    public IPostaSubscriberListsClient SubscriberLists => _section;
-    /// <inheritdoc />
-    public IPostaUnsubscribeListsClient UnsubscribeLists => _section;
-    /// <inheritdoc />
-    public IPostaInboundClient Inbound => _section;
-    /// <inheritdoc />
-    public IPostaWebhooksClient Webhooks => _section;
-    /// <inheritdoc />
-    public IPostaWorkspaceResourcesClient WorkspaceResources => _section;
-    /// <inheritdoc />
-    public IPostaAdminClient Admin => _section;
-    /// <inheritdoc />
-    public IPostaHealthClient Health => _section;
-    /// <inheritdoc />
-    public IPostaInfoClient Info => _section;
+
+    public PostaAuthClient Auth { get; private set; } = null!;
+    public PostaOAuthClient OAuth { get; private set; } = null!;
+    public PostaUsersClient Users { get; private set; } = null!;
+    public PostaWorkspacesClient Workspaces { get; private set; } = null!;
+    public PostaEmailsClient Emails { get; private set; } = null!;
+    public PostaTemplatesClient Templates { get; private set; } = null!;
+    public PostaCampaignsClient Campaigns { get; private set; } = null!;
+    public PostaSubscribersClient Subscribers { get; private set; } = null!;
+    public PostaSubscriberListsClient SubscriberLists { get; private set; } = null!;
+    public PostaUnsubscribeListsClient UnsubscribeLists { get; private set; } = null!;
+    public PostaInboundClient Inbound { get; private set; } = null!;
+    public PostaWebhooksClient Webhooks { get; private set; } = null!;
+    public PostaWorkspaceResourcesClient WorkspaceResources { get; private set; } = null!;
+    public PostaAdminClient Admin { get; private set; } = null!;
+    public PostaHealthClient Health { get; private set; } = null!;
+    public PostaInfoClient Info { get; private set; } = null!;
+
+    private void InitializeClients(PostaTransport transport)
+    {
+        Auth = new PostaAuthClient(transport, Endpoints);
+        OAuth = new PostaOAuthClient(transport, Endpoints);
+        Users = new PostaUsersClient(transport, Endpoints);
+        Workspaces = new PostaWorkspacesClient(transport, Endpoints);
+        Emails = new PostaEmailsClient(transport, Endpoints);
+        Templates = new PostaTemplatesClient(transport, Endpoints);
+        Campaigns = new PostaCampaignsClient(transport, Endpoints);
+        Subscribers = new PostaSubscribersClient(transport, Endpoints);
+        SubscriberLists = new PostaSubscriberListsClient(transport, Endpoints);
+        UnsubscribeLists = new PostaUnsubscribeListsClient(transport, Endpoints);
+        Inbound = new PostaInboundClient(transport, Endpoints);
+        Webhooks = new PostaWebhooksClient(transport, Endpoints);
+        WorkspaceResources = new PostaWorkspaceResourcesClient(transport, Endpoints);
+        Admin = new PostaAdminClient(transport, Endpoints);
+        Health = new PostaHealthClient(transport, Endpoints);
+        Info = new PostaInfoClient(transport, Endpoints);
+    }
 
     /// <summary>Releases the internally owned HTTP client, if one was created.</summary>
     public void Dispose() => _ownedHttpClient?.Dispose();

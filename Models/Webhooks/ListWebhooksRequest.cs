@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 namespace Posta.Models.Webhooks;
 
 /// <summary>Represents the ListWebhooksRequest payload.</summary>
-public class ListWebhooksRequest
+public class ListWebhooksRequest : Shared.SearchableListRequest
 {
     /// <summary>Gets or sets the <c>page</c> query parameter.</summary>
     [JsonIgnore]

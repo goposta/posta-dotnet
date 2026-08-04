@@ -28,7 +28,16 @@ SendAnEmailResponse? response = await client.Emails.SendAnEmailAsync(
     });
 ```
 
-The client exposes typed API areas such as `Emails`, `Templates`, `Campaigns`, `Subscribers`, `Inbound`, `Webhooks`, `Workspaces`, and `Admin`.
+The client exposes concrete, typed API clients such as `Emails`, `Templates`, `Campaigns`, `Subscribers`, `Inbound`, `Webhooks`, `Workspaces`, and `Admin`:
+
+```csharp
+PostaEmailsClient emails = client.Emails;
+PostaWebhooksClient webhooks = client.Webhooks;
+PostaInboundClient inbound = client.Inbound;
+PostaAdminClient admin = client.Admin;
+```
+
+Each API area has its own concrete client and operations file, so consumers only see the operations that belong to that area. Section client interfaces are intentionally not exposed.
 
 ## Known string values
 
@@ -101,9 +110,9 @@ builder.AddPostaClient("posta", settings =>
 });
 ```
 
-Resolve `IPostaClient` from dependency injection. `Posta.Aspire` reads the Aspire connection string, configures `HttpClient`, and enables service discovery for the logical `posta` host name.
+Resolve the concrete `PostaClient` from dependency injection. `Posta.Aspire` reads the Aspire connection string, configures `HttpClient`, and enables service discovery for the logical `posta` host name.
 
-Multiple Posta resources can be registered with `AddKeyedPostaClient(...)` and resolved through `GetRequiredKeyedService<IPostaClient>(key)`.
+Multiple Posta resources can be registered with `AddKeyedPostaClient(...)` and resolved through `GetRequiredKeyedService<PostaClient>(key)`.
 
 ## Error handling
 
@@ -131,7 +140,9 @@ When an `ILoggerFactory` is supplied to `PostaClient`, non-successful responses 
 
 ## Custom endpoints
 
-Endpoint definitions are virtual so deployments with custom routes can override only the required operation:
+Endpoint definitions are grouped by API area, including `IPostaEmailsEndpoints`, `IPostaWebhooksEndpoints`, `IPostaInboundEndpoints`, and `IPostaAdminEndpoints`. `IPostaEndpoints` combines these focused endpoint contracts into the complete catalog used by `PostaClient`. The default `PostaEndpoints` implementation is partial, with each API area's virtual properties stored in a matching file.
+
+Deployments with custom routes can continue to override only the required operation:
 
 ```csharp
 using Posta.Endpoints;
@@ -145,7 +156,24 @@ public sealed class CustomPostaEndpoints : PostaEndpoints
 
 ## API coverage
 
-The models and operations follow Posta 0.11.0's published OpenAPI document. A few operations whose wire formats are incomplete in that document are present but marked unsupported: CSV subscriber import, HTML template import, raw RFC 5322 message download, and inbound attachment download.
+The models, endpoints, and operations follow Posta 0.13.1. This includes inbound email management, streaming raw RFC 5322 messages and attachments, CSV subscriber import, HTML template import, update status, and authenticated SMTP-relay related platform APIs.
+
+Multipart imports accept file bytes and construct the required form fields:
+
+```csharp
+await client.Subscribers.BulkImportSubscribersCsvAsync(
+    new BulkImportSubscribersCsvRequest
+    {
+        File = await File.ReadAllBytesAsync("subscribers.csv"),
+        ColumnMapping = new Dictionary<int, string>
+        {
+            [0] = "email",
+            [1] = "name"
+        }
+    });
+```
+
+Download methods return `PostaStreamResponse`; dispose it after consuming `Stream`. Webhook payload models are in `Posta.Models.Webhooks`, and `Posta.Security.PostaWebhookSignature.Verify(...)` validates `X-Posta-Signature` against the raw request body using HMAC-SHA256.
 
 - [Posta documentation](https://docs.goposta.dev/)
 - [Posta API reference](https://app.goposta.dev/docs)

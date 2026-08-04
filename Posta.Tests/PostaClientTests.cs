@@ -30,13 +30,14 @@ public sealed class PostaClientTests
     }
 
     [Fact]
-    public void ApiSectionsUseTheSameUnderlyingClient()
+    public void ApiSectionsAreIndependentConcreteClients()
     {
         using var client = new PostaClient("https://posta.example.com", "secret");
 
-        Assert.Same(client.Emails, client.Health);
-        Assert.Same(client.Emails, client.Webhooks);
-        Assert.Same(client.Emails, client.Workspaces);
+        Assert.IsType<PostaEmailsClient>(client.Emails);
+        Assert.IsType<PostaHealthClient>(client.Health);
+        Assert.IsType<PostaWebhooksClient>(client.Webhooks);
+        Assert.IsType<PostaWorkspacesClient>(client.Workspaces);
     }
 
     [Fact]
@@ -75,7 +76,7 @@ public sealed class PostaClientTests
         };
         using var client = new PostaClient(httpClient, new FixedCredentialProvider("api-key"));
 
-        VerifyAnEmailAddressResponse? response = await client.Emails.VerifyAnEmailAddressAsync(
+        var response = await client.Emails.VerifyAnEmailAddressAsync(
             new VerifyAnEmailAddressRequest
             {
                 Email = "user@example.com",
@@ -95,7 +96,7 @@ public sealed class PostaClientTests
     [Fact]
     public async Task HealthProbeDoesNotSendAuthorizationHeader()
     {
-        bool hasAuthorization = true;
+        var hasAuthorization = true;
         var handler = new TestHttpMessageHandler((request, _) =>
         {
             hasAuthorization = request.Headers.Authorization is not null;
@@ -148,7 +149,7 @@ public sealed class PostaClientTests
         };
         using var client = new PostaClient(httpClient, new FixedCredentialProvider("access-token"));
 
-        GetUpdateStatusResponse? response = await client.Admin.GetUpdateStatusAsync();
+        var response = await client.Admin.GetUpdateStatusAsync();
 
         Assert.Equal("https://posta.example.com/api/v1/admin/update", requestUri?.AbsoluteUri);
         Assert.True(response?.Success);
@@ -179,7 +180,7 @@ public sealed class PostaClientTests
         };
         using var client = new PostaClient(httpClient, new FixedCredentialProvider("access-token"));
 
-        DismissUpdateNoticeResponse? response = await client.Admin.DismissUpdateNoticeAsync(
+        var response = await client.Admin.DismissUpdateNoticeAsync(
             new DismissUpdateNoticeRequest { Version = "v0.13.0" });
 
         Assert.Equal("https://posta.example.com/api/v1/admin/update/dismiss", requestUri?.AbsoluteUri);

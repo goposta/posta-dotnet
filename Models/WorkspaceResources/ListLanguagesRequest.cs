@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 namespace Posta.Models.WorkspaceResources;
 
 /// <summary>Represents the ListLanguagesRequest payload.</summary>
-public class ListLanguagesRequest
+public class ListLanguagesRequest : Shared.SearchableListRequest
 {
     /// <summary>Gets or sets the <c>page</c> query parameter.</summary>
     [JsonIgnore]

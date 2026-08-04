@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 namespace Posta.Models.WorkspaceResources;
 
 /// <summary>Represents the ListBouncesWorkspaceResourcesRequest payload.</summary>
-public class ListBouncesWorkspaceResourcesRequest
+public class ListBouncesWorkspaceResourcesRequest : Shared.SearchableListRequest
 {
     /// <summary>Gets or sets the <c>page</c> query parameter.</summary>
     [JsonIgnore]
