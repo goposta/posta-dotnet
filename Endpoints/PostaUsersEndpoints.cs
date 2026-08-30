@@ -52,7 +52,10 @@ public interface IPostaUsersEndpoints
         PostaEndpoint UpdateUserSettings { get; }
 
     /// <summary>Resend verification email</summary>
-        PostaEndpoint ResendVerificationEmail { get; }
+    PostaEndpoint ResendVerificationEmail { get; }
+
+    /// <summary>Sets the current user's default workspace.</summary>
+    PostaEndpoint SetDefaultWorkspace { get; }
 }
 
 public partial class PostaEndpoints
@@ -106,5 +109,8 @@ public partial class PostaEndpoints
         public virtual PostaEndpoint UpdateUserSettings { get; } = new(HttpMethod.Put, "/api/v1/users/me/settings", PostaAuthentication.AccessToken);
 
     /// <inheritdoc />
-        public virtual PostaEndpoint ResendVerificationEmail { get; } = new(HttpMethod.Post, "/api/v1/users/me/verify-email/resend", PostaAuthentication.AccessToken);
+    public virtual PostaEndpoint ResendVerificationEmail { get; } = new(HttpMethod.Post, "/api/v1/users/me/verify-email/resend", PostaAuthentication.AccessToken);
+
+    /// <inheritdoc />
+    public virtual PostaEndpoint SetDefaultWorkspace { get; } = new(HttpMethod.Put, "/api/v1/users/me/default-workspace", PostaAuthentication.AccessToken);
 }

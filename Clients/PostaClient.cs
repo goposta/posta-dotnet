@@ -116,6 +116,7 @@ public sealed class PostaClient : IDisposable
     public PostaAdminClient Admin { get; private set; } = null!;
     public PostaHealthClient Health { get; private set; } = null!;
     public PostaInfoClient Info { get; private set; } = null!;
+    public PostaMessagesClient Messages { get; private set; } = null!;
 
     private void InitializeClients(PostaTransport transport)
     {
@@ -134,6 +135,7 @@ public sealed class PostaClient : IDisposable
         Admin = new PostaAdminClient(transport, Endpoints);
         Health = new PostaHealthClient(transport, Endpoints);
         Info = new PostaInfoClient(transport, Endpoints);
+        Messages = new PostaMessagesClient(transport, Endpoints);
     }
 
     /// <summary>Releases the internally owned HTTP client, if one was created.</summary>

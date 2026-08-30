@@ -7,9 +7,9 @@
     <PackageId>Posta</PackageId>
     <AssemblyName>Posta</AssemblyName>
     <RootNamespace>Posta</RootNamespace>
-    <Version>0.1.0</Version>
+    <Version>0.1.14</Version>
     <Title>Posta .NET SDK</Title>
-    <Description>The .NET SDK for the Posta self-hosted email delivery platform.</Description>
+    <Description>.NET SDK 0.1.14 for the Posta 0.14.0 API.</Description>
     <Authors>Posta</Authors>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <PackageProjectUrl>https://docs.goposta.dev/</PackageProjectUrl>
@@ -19,10 +19,12 @@
     <PackageTags>posta email sdk api client</PackageTags>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <IsPackable>true</IsPackable>
-    <TargetFrameworks>net10.0;net11.0</TargetFrameworks>
+    <TargetFramework>net10.0</TargetFramework>
+    <LangVersion>default</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
+    <AssemblyMetadata Include="PostaApiVersion" Value="0.14.0" />
     <None Include="README.md" Pack="true" PackagePath="\" />
     <Compile Remove="Posta.Aspire\**\*.cs" />
     <Compile Remove="Posta.Tests\**\*.cs" />
@@ -36,7 +38,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.10" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.11" />
   </ItemGroup>
 
 </Project>

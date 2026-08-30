@@ -2,6 +2,8 @@
 
 The .NET SDK for [Posta](https://github.com/goposta/posta), the self-hosted email delivery and inbound platform.
 
+**SDK 0.1.14 · Posta API 0.14.0**
+
 ## Installation
 
 ```shell
@@ -28,12 +30,13 @@ SendAnEmailResponse? response = await client.Emails.SendAnEmailAsync(
     });
 ```
 
-The client exposes concrete, typed API clients such as `Emails`, `Templates`, `Campaigns`, `Subscribers`, `Webhooks`, `Workspaces`, and `Admin`:
+The client exposes concrete API clients such as `Emails`, `Templates`, `Campaigns`, `Subscribers`, `Webhooks`, `Workspaces`, `Messages`, and `Admin`:
 
 ```csharp
 PostaEmailsClient emails = client.Emails;
 PostaWebhooksClient webhooks = client.Webhooks;
 PostaAdminClient admin = client.Admin;
+PostaMessagesClient messages = client.Messages;
 ```
 
 Each API area has its own concrete client and operations file, so consumers only see the operations that belong to that area. Section client interfaces are intentionally not exposed.
@@ -155,7 +158,14 @@ public sealed class CustomPostaEndpoints : PostaEndpoints
 
 ## API coverage
 
-The models, endpoints, and operations follow the 219 operations documented by Posta 0.13.1. This includes CSV subscriber import, HTML template import, update status, authenticated SMTP-relay related platform APIs, and documented inbound webhook event payloads.
+The models, endpoints, and operations follow the 245 operations documented by Posta 0.14.0. This includes CSV subscriber import, HTML template import, update status, authenticated SMTP-relay related platform APIs, public forms, message filters, and inbound-message management.
+
+The new inbound-message operations are available through `client.Messages`. They return `JsonDocument` while the Posta message feature's schemas continue to evolve, but use the same authenticated transport and error handling as all typed SDK operations:
+
+```csharp
+using var response = await client.Messages.ListMessagesAsync(
+    new PostaRequest { Query = new Dictionary<string, object?> { ["page"] = 0, ["size"] = 25 } });
+```
 
 Multipart imports accept file bytes and construct the required form fields:
 

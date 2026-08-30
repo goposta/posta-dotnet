@@ -7,9 +7,9 @@
     <PackageId>Posta.Aspire</PackageId>
     <AssemblyName>Posta.Aspire</AssemblyName>
     <RootNamespace>Posta.Aspire</RootNamespace>
-    <Version>0.1.0</Version>
+    <Version>0.1.14</Version>
     <Title>Posta Aspire Client Integration</Title>
-    <Description>Aspire service discovery and dependency injection support for the Posta .NET SDK.</Description>
+    <Description>Aspire integration for Posta .NET SDK 0.1.14 and the Posta 0.14.0 API.</Description>
     <Authors>Posta</Authors>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <PackageProjectUrl>https://docs.goposta.dev/</PackageProjectUrl>
@@ -19,15 +19,17 @@
     <PackageTags>posta aspire email sdk api client</PackageTags>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <IsPackable>true</IsPackable>
-    <TargetFrameworks>net10.0;net11.0</TargetFrameworks>
+    <TargetFramework>net10.0</TargetFramework>
+    <LangVersion>default</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
+    <AssemblyMetadata Include="PostaApiVersion" Value="0.14.0" />
     <ProjectReference Include="..\Posta.csproj" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="10.0.10" />
-    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="10.0.10" />
-    <PackageReference Include="Microsoft.Extensions.Http" Version="10.0.10" />
-    <PackageReference Include="Microsoft.Extensions.ServiceDiscovery" Version="10.8.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="10.0.11" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="10.0.11" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="10.0.11" />
+    <PackageReference Include="Microsoft.Extensions.ServiceDiscovery" Version="10.9.0" />
   </ItemGroup>
 
   <ItemGroup>

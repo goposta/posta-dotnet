@@ -5,6 +5,12 @@ namespace Posta.Clients;
 
 public sealed partial class PostaUsersClient
 {
+    /// <summary>Sets the current user's default workspace.</summary>
+    public Task<Users.SetDefaultWorkspaceResponse?> SetDefaultWorkspaceAsync(Users.SetDefaultWorkspaceRequest request, CancellationToken cancellationToken = default)
+    {
+        return SendAsync<Users.SetDefaultWorkspaceResponse>(_endpoints.SetDefaultWorkspace, new PostaRequest { Body = request }, cancellationToken);
+    }
+
     public Task<Users.RevokeSessionResponse?> RevokeSessionAsync(Users.RevokeSessionRequest request, CancellationToken cancellationToken = default)
     {
         PostaRequest postaRequest = new()
@@ -118,7 +124,6 @@ public sealed partial class PostaUsersClient
         return SendAsync<Users.GetUserSettingsResponse>(_endpoints.GetUserSettings, null, cancellationToken);
     }
 }
-
 
 
 

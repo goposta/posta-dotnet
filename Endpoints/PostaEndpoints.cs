@@ -9,6 +9,7 @@ public interface IPostaEndpoints :
     IPostaEmailsEndpoints,
     IPostaHealthEndpoints,
     IPostaInfoEndpoints,
+    IPostaMessagesEndpoints,
     IPostaOAuthEndpoints,
     IPostaSubscriberListsEndpoints,
     IPostaSubscribersEndpoints,
